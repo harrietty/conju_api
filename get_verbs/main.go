@@ -9,7 +9,12 @@ import (
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Received request: ", request.HTTPMethod, request.Path, request.QueryStringParameters)
 
-	return events.APIGatewayProxyResponse{Body: "successful, yay", StatusCode: 200}, nil
+	language, ok := request.QueryStringParameters["language"]
+	if !ok {
+		return events.APIGatewayProxyResponse{StatusCode: 404}, nil
+	}
+
+	return events.APIGatewayProxyResponse{Body: "You requested " + language, StatusCode: 200}, nil
 }
 
 func main() {

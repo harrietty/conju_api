@@ -12,7 +12,7 @@ package:
     - ./bin/**
 
 functions:
-  getVerbs:
+  verbs:
     handler: bin/get_verbs
     events:
       - http:
