@@ -12,9 +12,9 @@ package:
     - ./bin/**
 
 functions:
-  hello:
-    handler: bin/hello
+  getVerbs:
+    handler: bin/get_verbs
     events:
       - http:
-          path: hello
+          path: verbs
           method: get
