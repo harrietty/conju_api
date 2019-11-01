@@ -1,4 +1,6 @@
-.PHONY: build clean deploy
+.PHONY: build clean funcdeploy deploy
+
+all: clean build funcdeploy
 
 build:
 	dep ensure -v
@@ -7,5 +9,8 @@ build:
 clean:
 	rm -rf ./bin ./vendor Gopkg.lock
 
-deploy: clean build
+funcdeploy: clean build
+	sls deploy -f verbs --verbose
+
+deploy:
 	sls deploy --verbose
