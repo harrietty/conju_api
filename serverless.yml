@@ -18,3 +18,4 @@ functions:
       - http:
           path: verbs
           method: get
+          cors: true

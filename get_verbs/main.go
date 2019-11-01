@@ -54,7 +54,10 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		log.Println("Error marshalling JSON: ", err)
 	}
 
-	return events.APIGatewayProxyResponse{Body: string(inf), StatusCode: 200}, nil
+	headers := make(map[string]string)
+	headers["Access-Control-Allow-Origin"] = "*"
+	headers["Access-Control-Allow-Credentials"] = "true"
+	return events.APIGatewayProxyResponse{Body: string(inf), StatusCode: 200, Headers: headers}, nil
 }
 
 type infinitives []string
