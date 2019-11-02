@@ -48,6 +48,7 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchKey:
 				log.Println(s3.ErrCodeNoSuchKey, aerr.Error())
+				return events.APIGatewayProxyResponse{StatusCode: 404}, nil
 			default:
 				log.Println(aerr.Error())
 			}

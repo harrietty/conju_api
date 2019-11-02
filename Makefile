@@ -1,6 +1,10 @@
-.PHONY: build clean funcdeploy deploy
+.PHONY: build clean funcdeploy deploy funcdeployprod deployprod
 
 all: clean build funcdeploy
+
+dev: clean build funcdeploy
+
+prod: clean build funcdeployprod
 
 build:
 	dep ensure -v
@@ -13,4 +17,10 @@ funcdeploy: clean build
 	sls deploy -f infinitives --verbose
 
 deploy:
+	sls deploy --verbose
+
+funcdeployprod:
+	sls deploy -f infinitives --stage prod --verbose
+
+deployprod:
 	sls deploy --verbose

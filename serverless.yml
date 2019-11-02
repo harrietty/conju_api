@@ -6,6 +6,13 @@ provider:
   runtime: go1.x
   region: eu-west-1
   stage: dev
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+      Resource:
+        - "arn:aws:s3:::conjugator-verb-data/*"
+        - "arn:aws:s3:::conjugator-verb-data"
 
 custom:
   stage: ${opt:stage, self:provider.stage}
