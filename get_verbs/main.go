@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,7 +14,15 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+type handler struct {
+	stage string
+}
+
+func newHandler(stage string) handler {
+	return handler{stage: stage}
+}
+
+func (h handler) handleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	log.Println("Received request: ", request.HTTPMethod, request.Path, request.QueryStringParameters)
 
 	language, ok := request.QueryStringParameters["language"]
@@ -21,10 +30,15 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return events.APIGatewayProxyResponse{StatusCode: 404}, nil
 	}
 
+	languageFileName := language + ".json"
+	if h.stage == "dev" {
+		languageFileName = language + ".dev.json"
+	}
+
 	svc := s3.New(session.New())
 	input := &s3.GetObjectInput{
 		Bucket: aws.String("conjugator-verb-data"),
-		Key:    aws.String(language + ".json"),
+		Key:    aws.String(languageFileName),
 	}
 	result, err := svc.GetObject(input)
 	if err != nil {
@@ -101,5 +115,10 @@ func extractInfinitives(languageData languageData) []string {
 }
 
 func main() {
-	lambda.Start(handler)
+	stage, exists := os.LookupEnv("STAGE")
+	if !exists {
+		stage = "dev"
+	}
+	h := newHandler(stage)
+	lambda.Start(h.handleRequest)
 }
