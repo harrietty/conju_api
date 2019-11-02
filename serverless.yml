@@ -17,12 +17,12 @@ custom:
     - ./bin/**
 
 functions:
-  verbs:
-    handler: bin/get_verbs
+  infinitives:
+    handler: bin/infinitives
     environment:
       STAGE: ${self:custom.stage}
     events:
       - http:
-          path: verbs
+          path: infinitives
           method: get
           cors: true

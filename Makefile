@@ -4,13 +4,13 @@ all: clean build funcdeploy
 
 build:
 	dep ensure -v
-	env GOOS=linux go build -ldflags="-s -w" -o bin/get_verbs get_verbs/main.go
+	env GOOS=linux go build -ldflags="-s -w" -o bin/infinitives lambdas/infinitives/main.go
 
 clean:
 	rm -rf ./bin ./vendor Gopkg.lock
 
 funcdeploy: clean build
-	sls deploy -f verbs --verbose
+	sls deploy -f infinitives --verbose
 
 deploy:
 	sls deploy --verbose

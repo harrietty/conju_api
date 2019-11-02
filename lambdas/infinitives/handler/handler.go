@@ -1,28 +1,30 @@
-package main
+package handler
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"os"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/harrietty/conju_api/verbs"
 )
 
-type handler struct {
+// Handler struct
+type Handler struct {
 	stage string
 }
 
-func newHandler(stage string) handler {
-	return handler{stage: stage}
+// New creates a new handler
+func New(stage string) Handler {
+	return Handler{stage: stage}
 }
 
-func (h handler) handleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+// HandleRequest handles an API Request and responds with an array of infinitive verbs
+func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	log.Println("Received request: ", request.HTTPMethod, request.Path, request.QueryStringParameters)
 
 	language, ok := request.QueryStringParameters["language"]
@@ -62,7 +64,6 @@ func (h handler) handleRequest(request events.APIGatewayProxyRequest) (events.AP
 	}
 
 	langData := parseLanguageJSON(s3ObjectBytes)
-	// langDataJSON, err := json.Marshal(langData)
 	inf, err := json.Marshal(extractInfinitives(langData))
 	if err != nil {
 		log.Println("Error marshalling JSON: ", err)
@@ -74,51 +75,16 @@ func (h handler) handleRequest(request events.APIGatewayProxyRequest) (events.AP
 	return events.APIGatewayProxyResponse{Body: string(inf), StatusCode: 200, Headers: headers}, nil
 }
 
-type infinitives []string
-
-type languageData struct {
-	Pronouns []string `json:"pronouns"`
-	Verbs    verbs    `json:"verbs"`
-}
-
-type verbs struct {
-	Basic []verb `json:"basic"`
-}
-
-type verb struct {
-	Infinitive   string       `json:"infinitive"`
-	Translations []string     `json:"translations"`
-	Type         []string     `json:"type"`
-	Conjugations conjugations `json:"conjugations"`
-}
-
-type conjugations struct {
-	Present     []string `json:"present"`
-	Preterite   []string `json:"preterite"`
-	Imperfect   []string `json:"imperfect"`
-	Conditional []string `json:"conditional"`
-	Future      []string `json:"future"`
-}
-
-func parseLanguageJSON(jsonData []byte) languageData {
-	var langData languageData
+func parseLanguageJSON(jsonData []byte) verbs.LanguageData {
+	var langData verbs.LanguageData
 	json.Unmarshal(jsonData, &langData)
 	return langData
 }
 
-func extractInfinitives(languageData languageData) []string {
+func extractInfinitives(languageData verbs.LanguageData) []string {
 	var res []string
 	for _, val := range languageData.Verbs.Basic {
 		res = append(res, val.Infinitive)
 	}
 	return res
-}
-
-func main() {
-	stage, exists := os.LookupEnv("STAGE")
-	if !exists {
-		stage = "dev"
-	}
-	h := newHandler(stage)
-	lambda.Start(h.handleRequest)
 }
