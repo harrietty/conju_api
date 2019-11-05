@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/harrietty/conju_api/lambdas/infinitives/handler"
+	"github.com/harrietty/conju_api/lambdas/conjugations/handler"
 	"github.com/harrietty/conju_api/verbsbucket"
 )
 

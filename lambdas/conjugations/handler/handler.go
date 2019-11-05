@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -25,7 +27,7 @@ func New(stage string, vfg verbsbucket.VerbsFileGetter) Handler {
 	}
 }
 
-// HandleRequest handles an API Request and responds with an array of infinitive verbs
+// HandleRequest handles an API Request and responds with an array of verb conjugations
 func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	log.Println("Received request: ", request.HTTPMethod, request.Path, request.QueryStringParameters)
 
@@ -33,6 +35,14 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 	if !ok {
 		return events.APIGatewayProxyResponse{StatusCode: 404}, nil
 	}
+
+	verbs, verbsProvided := request.QueryStringParameters["verbs"]
+	var verbsArr []string
+	if verbsProvided {
+		verbsArr = strings.Split(verbs, ",")
+	}
+
+	fmt.Println(verbsArr)
 
 	languageFileName := language + ".json"
 	if h.stage == "dev" {
@@ -57,27 +67,20 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 	}
 
 	langData := parseLanguageJSON(s3ObjectBytes)
-	inf, err := json.Marshal(extractInfinitives(langData))
+	jsonString, err := json.Marshal(langData)
 	if err != nil {
 		log.Println("Error marshalling JSON: ", err)
+		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
 
 	headers := make(map[string]string)
 	headers["Access-Control-Allow-Origin"] = "*"
 	headers["Access-Control-Allow-Credentials"] = "true"
-	return events.APIGatewayProxyResponse{Body: string(inf), StatusCode: 200, Headers: headers}, nil
+	return events.APIGatewayProxyResponse{StatusCode: 200, Body: string(jsonString), Headers: headers}, nil
 }
 
 func parseLanguageJSON(jsonData []byte) verbs.LanguageData {
 	var langData verbs.LanguageData
 	json.Unmarshal(jsonData, &langData)
 	return langData
-}
-
-func extractInfinitives(languageData verbs.LanguageData) []string {
-	var res []string
-	for _, val := range languageData.Verbs.Basic {
-		res = append(res, val.Infinitive)
-	}
-	return res
 }

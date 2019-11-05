@@ -33,3 +33,12 @@ functions:
           path: infinitives
           method: get
           cors: true
+  conjugations:
+    handler: bin/conjugations
+    environment:
+      STAGE: ${self:custom.stage}
+    events:
+      - http:
+          path: conjugations
+          method: get
+          cors: true
