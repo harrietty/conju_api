@@ -1,0 +1,15 @@
+language: go
+
+go_import_path: github.com/harrietty/conju_api
+
+branches:
+  only:
+    - master
+
+install: ./install-dependencies.sh
+build:
+  - make build
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: make deployprod
