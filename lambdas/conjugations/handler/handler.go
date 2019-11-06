@@ -66,12 +66,15 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
 
+	fmt.Println("Fetches language data")
 	langData := parseLanguageJSON(s3ObjectBytes)
+	fmt.Println("got langData as JSON")
 	jsonString, err := json.Marshal(langData)
 	if err != nil {
 		log.Println("Error marshalling JSON: ", err)
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
+	fmt.Println("Marshalled JSON")
 
 	headers := make(map[string]string)
 	headers["Access-Control-Allow-Origin"] = "*"
