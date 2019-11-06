@@ -13,6 +13,13 @@ install: ./install-dependencies.sh
 build:
   - make build
 deploy:
-  provider: script
-  skip_cleanup: true
-  script: make deployprod
+  - provider: script
+    skip_cleanup: true
+    script: make deployprod
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: make deploy
+    on:
+      branch: dev
