@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/harrietty/conju_api/verbs"
 	"github.com/harrietty/conju_api/verbsbucket"
+	"github.com/jinzhu/copier"
 )
 
 // Handler struct
@@ -42,7 +43,7 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 		verbsArr = strings.Split(verbs, ",")
 	}
 
-	fmt.Println(verbsArr)
+	fmt.Println("Requested verbs: ", verbsArr)
 
 	languageFileName := language + ".json"
 	if h.stage == "dev" {
@@ -66,15 +67,17 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
 
-	fmt.Println("Fetches language data")
 	langData := parseLanguageJSON(s3ObjectBytes)
-	fmt.Println("got langData as JSON")
+
+	if verbsProvided {
+		langData = extractRelevantVerbs(langData, verbsArr)
+	}
+
 	jsonString, err := json.Marshal(langData)
 	if err != nil {
 		log.Println("Error marshalling JSON: ", err)
 		return events.APIGatewayProxyResponse{StatusCode: 500}, nil
 	}
-	fmt.Println("Marshalled JSON")
 
 	headers := make(map[string]string)
 	headers["Access-Control-Allow-Origin"] = "*"
@@ -86,4 +89,33 @@ func parseLanguageJSON(jsonData []byte) verbs.LanguageData {
 	var langData verbs.LanguageData
 	json.Unmarshal(jsonData, &langData)
 	return langData
+}
+
+func extractRelevantVerbs(l verbs.LanguageData, v []string) verbs.LanguageData {
+	lc := verbs.LanguageData{}
+	copier.Copy(&lc, &l)
+
+	var selectedVerbs []verbs.Verb
+
+	// How to do something like this?
+	// lc.Verbs.Basic = []verbs.Verb
+	for _, elem := range l.Verbs.Basic {
+		if contains(v, elem.Infinitive) {
+			fmt.Println("contains verb ", elem.Infinitive)
+			selectedVerbs = append(selectedVerbs, elem)
+			fmt.Println(len(lc.Verbs.Basic))
+		}
+	}
+
+	lc.Verbs.Basic = selectedVerbs
+	return lc
+}
+
+func contains(sl []string, s string) bool {
+	for _, elem := range sl {
+		if elem == s {
+			return true
+		}
+	}
+	return false
 }
