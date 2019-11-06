@@ -8,6 +8,7 @@ go_import_path: github.com/harrietty/conju_api
 branches:
   only:
     - master
+    - dev
 
 install: ./install-dependencies.sh
 build:
