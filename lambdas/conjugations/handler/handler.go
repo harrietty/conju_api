@@ -85,6 +85,33 @@ func (h Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.AP
 	return events.APIGatewayProxyResponse{StatusCode: 200, Body: string(jsonString), Headers: headers}, nil
 }
 
+func extractRelevantVerbs(l verbs.LanguageData, v []string) verbs.LanguageData {
+	lc := verbs.LanguageData{}
+	copier.Copy(&lc, &l)
+
+	var selectedVerbs []verbs.Verb
+
+	// How to do something like this?
+	// lc.Verbs.Basic = []verbs.Verb
+	for _, elem := range l.Verbs.Basic {
+		if contains(v, elem.Infinitive) {
+			selectedVerbs = append(selectedVerbs, elem)
+		}
+	}
+
+	lc.Verbs.Basic = selectedVerbs
+	return lc
+}
+
+func contains(v []string, elem string) bool {
+	for _, val := range v {
+		if val == elem {
+			return true
+		}
+	}
+	return false
+}
+
 func parseLanguageJSON(jsonData []byte) verbs.LanguageData {
 	var langData verbs.LanguageData
 	json.Unmarshal(jsonData, &langData)
