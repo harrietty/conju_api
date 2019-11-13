@@ -9,10 +9,12 @@ type LanguageData struct {
 	Verbs    Verbs    `json:"verbs"`
 }
 
+// Verbs is an array of Verb structs
 type Verbs struct {
 	Basic []Verb `json:"basic"`
 }
 
+// Verb represents a single verb with its translations conjugations
 type Verb struct {
 	Infinitive   string       `json:"infinitive"`
 	Translations []string     `json:"translations"`
@@ -20,6 +22,7 @@ type Verb struct {
 	Conjugations Conjugations `json:"conjugations"`
 }
 
+// Conjugations is a struct of conjugations for a specific verb
 type Conjugations struct {
 	Present     []string `json:"present"`
 	Preterite   []string `json:"preterite"`
