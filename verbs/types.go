@@ -30,3 +30,23 @@ type Conjugations struct {
 	Conditional []string `json:"conditional"`
 	Future      []string `json:"future"`
 }
+
+// EnglishData is a struct of English verb data
+type EnglishData struct {
+	Pronouns []string     `json:"pronouns"`
+	Verbs    EnglishVerbs `json:"verbs"`
+}
+
+// EnglishVerbs is a struct containing different types of English verbs
+type EnglishVerbs struct {
+	Basic map[string]EnglishVerb `json:"basic"`
+}
+
+// EnglishVerb represents a single English verb and its conjugations
+type EnglishVerb struct {
+	Present           []string `json:"present"`
+	Preterite         []string `json:"preterite"`
+	PresentParticiple string   `json:"present_participle"`
+	PastParticiple    string   `json:"past_participle"`
+	Root              string   `json:"root"`
+}
