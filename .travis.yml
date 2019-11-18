@@ -1,16 +1,12 @@
 language: go
-
 go:
   - 1.13.x
-
 go_import_path: github.com/harrietty/conju_api
-
 branches:
   only:
     - master
     - dev
-
-install: ./install-dependencies.sh
+install: "./install-dependencies.sh"
 build:
   - make build
 deploy:
@@ -24,3 +20,9 @@ deploy:
     script: make deploy
     on:
       branch: dev
+notifications:
+  slack:
+    on_success: change
+    on_failure: always
+    rooms:
+      - secure: g04nt4MLpz82lHaGDbOCS4DVOKU7WZAvVkyKqfx3N5SuCV/v003jL/g4OBjNDQogqsk4M0ygZZUbkeHHD7sb4aXgoqiu9HJYaP04YJ7UUKVd0bMAU5hIkozSyvutnUDbHMUa4EG/ol0lb9ULZvY5j6hINoLQAH1xt+oFQObkS/tkJgTIERTpCgYdwwGunV+aUd+pMrf4/DptnXhWO8pvQTel0QbHG9SGdAnhDPpUHag5hGWLFmJyr1STM6rUK9rq0XAq+6g4+3LTthmCvjjyuVoPFAlS9FnFp4cBhmmnA7v05Xiyg9ztHeYCJw2AhX4lQwvM9gCRLD/4aBahK4seh3IOFcZ/xSs2ftz2TG4NlMR9/jfQDmRoG0MmKgkRmmY2lBQsflmjwezOkGn62c82BkBYcwtXjmTV3Y7chPktWcVMyq/SNv26WNyRvKu7pU3i89xtTeMEABK5TWQbH1DaqzeCWqMVLLMYJUudUsB423Myscv2PDcDa3fk8PZpeDlX9Cp4kayyGczTjU7YXenYsK8amHHpFHHBU0Zpx2rMrdWXKOvm1gDi0cCSqob8KACZkjoXwFXh5PVGUrlSKUHxDX2kKKnnInN1G/Frjsw2WUF/CfCL+nFJQeQxsor1Akkw7zkN9h09ft+Mi+v39jOv8UFDEgZk1b8meLYbQq2TXSU=
